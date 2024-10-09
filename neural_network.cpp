@@ -1,68 +1,56 @@
-#include <SFML/Graphics.hpp>
-#include <vector>
-#include <iostream>
-#include <cassert>
-#include <random>
-#include <iomanip>
-#include <sstream>
+#include "neural_network.h"
 
-void draw_graph(sf::RenderWindow& window, int length, std::vector<int> neurons, std::vector<std::vector<float>>);
-std::vector<std::vector<float>> initialize_weights(int length, std::vector<int> neurons);
-
-const int screen_width = 800, screen_height = 600;
-const int font_size = 35;
-const float radius = 35;
-
-int main()
+NeuralNetwork::NeuralNetwork(std::vector<int> neural_network_neurons)
 {
-    //                                    width,        height
-    sf::RenderWindow window(sf::VideoMode(screen_width, screen_height), "SFML works!");
+    this->neurons = neural_network_neurons;
+    this->network_length = neural_network_neurons.size();
 
-    int neural_network_length = 3;
-    std::vector<int> neural_network_neurons = { 2, 3, 1 };
-    assert(neural_network_length = neural_network_neurons.size());
-    std::vector<std::vector<float>> neuron_values = initialize_weights(neural_network_length, neural_network_neurons);
+    this->neuron_values = initialize_neuron_values(network_length, neural_network_neurons);
 
-    while (window.isOpen())
+    // For 3 layers we want 2 set of weights
+    for (int i = 0; i < this->neurons.size() - 1; i++)
     {
-        sf::Event event;
-        while (window.pollEvent(event))
+        int neuron_index = 0;
+        std::map<int, std::vector<float>> temp_weights;
+        std::vector<float> temp_vector;
+        for (int j = 0; j < neurons[i] * neurons[i+1]; j++)
         {
-            if (event.type == sf::Event::Closed || (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape))
-                window.close();
+            temp_vector.push_back(generate_random());
+            if ((j + 1) % neurons[i + 1] == 0)
+            {
+                temp_weights[neuron_index++] = temp_vector;
+                temp_vector.clear();
+            }
         }
-
-        window.clear();
-        draw_graph(window, neural_network_length, neural_network_neurons, neuron_values);
-        window.display();
+        this->weights.push_back(temp_weights);
     }
-}
 
-float generate_random()
-{
-    std::random_device rd;
-    std::mt19937 generator(rd());
-    std::normal_distribution<float> distribution(0.0, 1.0);
-    std::cout << "Random = " << distribution(generator) << std::endl;
-    return distribution(generator);
-}
-
-std::vector<std::vector<float>> initialize_weights(int length, std::vector<int> neurons)
-{
-    std::vector<std::vector<float>> init_values(length);
-    for (int i = 0; i < length; i++)
+    for (int layer = 0; layer < weights.size(); ++layer) 
     {
-        for (int j = 0; j < neurons[i]; j++)
+        std::cout << "Layer " << layer << " weights:" << std::endl;
+        for (const auto& neuron_pair : weights[layer]) 
         {
-            float random_value = generate_random();
-            init_values[i].push_back(random_value);
+            int neuron_index = neuron_pair.first;  // The key in the map (neuron index)
+            const std::vector<float>& neuron_weights = neuron_pair.second;  // The vector of weights
+            std::cout << "  Neuron " << neuron_index << ": ";
+            for (float weight : neuron_weights) 
+            {
+                std::cout << weight << " ";
+            }
+
+            std::cout << std::endl;
         }
     }
-    return init_values;
 }
 
-void draw_graph(sf::RenderWindow& window, int length, std::vector<int> neurons, std::vector<std::vector<float>> neuron_values)
+NeuralNetwork::~NeuralNetwork()
 {
+
+}
+
+void NeuralNetwork::draw_graph(sf::RenderWindow& window)
+{
+    const int length = neurons.size();
     float min_neuron_value = 100, max_neuron_value = -100;
     for (int i = 0; i < neuron_values.size(); i++)
     {
@@ -163,3 +151,66 @@ void draw_graph(sf::RenderWindow& window, int length, std::vector<int> neurons, 
     }
 }
 
+float NeuralNetwork::generate_random()
+{
+    std::random_device rd;
+    std::mt19937 generator(rd());
+    std::normal_distribution<float> distribution(0.0, 1.0);
+    return distribution(generator);
+}
+
+std::vector<std::vector<float>> NeuralNetwork::initialize_neuron_values(int length, std::vector<int> neurons)
+{
+    std::vector<std::vector<float>> init_values(length);
+    for (int i = 0; i < length; i++)
+    {
+        for (int j = 0; j < neurons[i]; j++)
+        {
+            float random_value = generate_random();
+            init_values[i].push_back(random_value);
+        }
+    }
+    return init_values;
+}
+
+float NeuralNetwork::forward_pass(std::vector<float> inputs)
+{
+    // Loop through each layer of the network
+    for (int layer = 0; layer < network_length; layer++)
+    {
+        if (layer == 0)  // Input layer
+        {
+            for (int i = 0; i < inputs.size(); i++)
+                neuron_values[0][i] = inputs[i];
+        }
+        else  // Hidden and output layers
+        {
+            float weighted_sum = 0.0f;
+            for (int i = 0; i < neuron_values[layer].size(); i++)
+            {
+                int counter = 0;
+                for (const auto& neuron_pair : weights[layer - 1])
+                {
+                    float input = neuron_values[layer - 1][counter];
+                    weighted_sum += input * weights[layer - 1][counter][i];
+                    std::cout << "Neuron in layer " << layer << " number: " << i << " input: " << input << " times " << weights[layer - 1][counter][i] << std::endl;
+                    counter++;
+                }
+                neuron_values[layer][i] = weighted_sum;
+                weighted_sum = 0.0f;
+            }
+        }
+    }
+    
+    return neuron_values[network_length - 1][0];
+}
+
+float NeuralNetwork::backward_pass()
+{
+    return 1.0f;
+}
+
+float NeuralNetwork::activation_function(float x)
+{
+    return 1.0f / (1.0f + exp(-x));
+}

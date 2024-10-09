@@ -139,7 +139,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="NeuralNetworks.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="neural_network.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="neural_network.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
