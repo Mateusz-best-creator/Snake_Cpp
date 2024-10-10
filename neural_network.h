@@ -32,6 +32,9 @@ public:
 	float generate_random();
 
 	float activation_function(float);
-	float forward_pass(std::vector<float>);
-	float backward_pass();
+	float activation_function_derivative(float);
+	float cost_function(float, float);
+
+	void forward_pass(std::vector<float>);
+	void backward_pass(std::vector<float>, float learning_rate = 0.1);
 };

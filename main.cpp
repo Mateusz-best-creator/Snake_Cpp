@@ -34,7 +34,8 @@ int main()
     assert(neural_network_length == neural_network_neurons.size());
     //assert(inputs.size() == neural_network_neurons[0]);
     NeuralNetwork nn(neural_network_neurons);
-    nn.forward_pass(inputs);
+    //nn.forward_pass(inputs);
+    //nn.backward_pass({1}); // We want 1 as our final answer
     while (window.isOpen())
     {
         sf::Event event;
@@ -48,8 +49,8 @@ int main()
 
         // Training & drawing neural network
         nn.draw_graph(window);
-        //nn.forward_pass(inputs);
-        nn.backward_pass();
+        nn.forward_pass(inputs);
+        nn.backward_pass({1});
 
         window.display();
     }

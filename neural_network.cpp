@@ -1,4 +1,5 @@
 #include "neural_network.h"
+#include <cmath>
 
 NeuralNetwork::NeuralNetwork(std::vector<int> neural_network_neurons)
 {
@@ -173,12 +174,12 @@ std::vector<std::vector<float>> NeuralNetwork::initialize_neuron_values(int leng
     return init_values;
 }
 
-float NeuralNetwork::forward_pass(std::vector<float> inputs)
+void NeuralNetwork::forward_pass(std::vector<float> inputs)
 {
     // Loop through each layer of the network
     for (int layer = 0; layer < network_length; layer++)
     {
-        if (layer == 0)  // Input layer
+        if (layer == 0)
         {
             for (int i = 0; i < inputs.size(); i++)
                 neuron_values[0][i] = inputs[i];
@@ -196,21 +197,91 @@ float NeuralNetwork::forward_pass(std::vector<float> inputs)
                     std::cout << "Neuron in layer " << layer << " number: " << i << " input: " << input << " times " << weights[layer - 1][counter][i] << std::endl;
                     counter++;
                 }
-                neuron_values[layer][i] = weighted_sum;
+                // We skip the bias term
+                neuron_values[layer][i] = activation_function(weighted_sum);
                 weighted_sum = 0.0f;
             }
         }
     }
-    
-    return neuron_values[network_length - 1][0];
 }
 
-float NeuralNetwork::backward_pass()
+void NeuralNetwork::backward_pass(std::vector<float> desired_output, float learning_rate)
 {
-    return 1.0f;
+    // For now I assume we have single output neuron
+    std::vector<float> final_errors;
+    int last_layer = network_length - 1;
+    for (int i = 0; i < desired_output.size(); i++)
+    {
+        final_errors.push_back(cost_function(desired_output[i], neuron_values[last_layer][i]));
+    }
+    // W0 -= learning_rate  * error[i] * function(i) * function_derivative(i)
+    
+    std::vector<std::vector<float>> errors;
+    errors.push_back(final_errors);
+    int counter = 0;
+    for (int layer = network_length - 2; layer >= 0; layer--)
+    {
+        std::vector<float> local_errors;
+        for (int neuron = 0; neuron < neurons[layer]; neuron++)
+        {
+            float local_error = 0.0f;
+            for (int connection = 0; connection < neurons[layer + 1]; connection++)
+            {
+                float previous_error = errors[counter][connection];
+                float weight = weights[layer][neuron][connection];
+                local_error += weight * previous_error;
+            }
+            local_errors.push_back(local_error);
+        }
+        errors.push_back(local_errors);
+        counter++;
+    }
+
+    for (int i = 0; i < errors.size(); i++)
+    {
+        std::cout << "Errors number " << i << ": \n";
+        for (int j = 0; j < errors[i].size(); j++)
+        {
+            std::cout << errors[i][j] << " ";
+        }
+        std::cout << "\n";
+    }
+
+    for (int layer = 0; layer < weights.size(); ++layer)
+    {
+        for (auto& neuron_pair : weights[layer])
+        {
+            int neuron_index = neuron_pair.first;// neuron index
+            std::vector<float>& neuron_weights = neuron_pair.second;  // The vector of weights
+            int counter = 0;
+            for (float& weight : neuron_weights)
+            {
+                // Apply weight update formula
+                int error_index;
+                if (layer == 0) error_index = 1;
+                else if (layer == 1) error_index = 0;
+                else error_index = 2;
+                std::cout << error_index << " : " << counter << std::endl;
+                float error = errors[error_index][counter++];
+                weight -= learning_rate * error * activation_function(error) * activation_function_derivative(error);
+            }
+        }
+    }
 }
 
 float NeuralNetwork::activation_function(float x)
 {
     return 1.0f / (1.0f + exp(-x));
+}
+
+float NeuralNetwork::activation_function_derivative(float x)
+{
+    float sig = activation_function(x);
+    return sig * (1.0 - sig);
+}
+
+// We will use MSE cost function to punish large errors
+float NeuralNetwork::cost_function(float desired_x, float predicted_x)
+{
+    return pow(desired_x - predicted_x, 2);
 }
