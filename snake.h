@@ -2,8 +2,14 @@
 
 #include <SFML/Graphics.hpp>
 
+const int SQUARE_SIZE = 35;
 const int NUMBER_VERTICAL_SQUARES = 20;
 const int NUMBER_HORIZONTAL_SQUARES = 20;
+
+struct Point
+{
+	int square_row, square_col;
+};
 
 class Snake
 {
@@ -17,16 +23,12 @@ public:
 	};
 
 private:
-	struct Point
-	{
-		int square_row, square_col;
-	};
-	const int SQUARE_SIZE = 35;
-	std::vector<Point> temp_snake_squares;
-	MovingDirection current_moving_direction = MovingDirection::RIGHT;
+	std::vector<Point> snake_squares;
+	MovingDirection current_moving_direction;
 
 public:
 	Snake();
-	void update(MovingDirection);
+	Point update(MovingDirection);
 	void draw(sf::RenderWindow&);
+	bool lost();
 };

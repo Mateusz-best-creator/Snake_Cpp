@@ -21,7 +21,13 @@ private:
 
 	Snake snake;
 
+	std::vector<Point> fruits_points = { {1,1}, {18, 18} };
+	sf::RectangleShape fruit_square;
+	sf::Texture fruit_texture;
+
 public:
 	Board();
 	void draw_board(sf::RenderWindow&);
+	void draw_top_info(sf::RenderWindow&, const std::string&);
+	void check_fruit_snake_collision(Point& head);
 };

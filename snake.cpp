@@ -3,13 +3,17 @@
 #include <iostream>
 Snake::Snake()
 {
-    this->temp_snake_squares = { {10,8}, {10, 9}, {10, 10}, {10, 11} };
-
+    this->snake_squares = { {10,8}, {10, 9}, {10, 10}, {10, 11}, {10, 12}, {10, 13}, {10, 14}, {10, 15} };
+    this->current_moving_direction = MovingDirection::RIGHT;
 }
 
-void Snake::update(MovingDirection d)
+Point Snake::update(MovingDirection d)
 {
-    current_moving_direction = d;
+    if (!(current_moving_direction == MovingDirection::LEFT && d == MovingDirection::RIGHT ||
+        current_moving_direction == MovingDirection::RIGHT && d == MovingDirection::LEFT ||
+        current_moving_direction == MovingDirection::TOP && d == MovingDirection::BOTTOM ||
+        current_moving_direction == MovingDirection::BOTTOM && d == MovingDirection::TOP) && d)
+        current_moving_direction = d;
     int change_row = 0, change_col = 0;
     switch (current_moving_direction)
     {
@@ -31,8 +35,8 @@ void Snake::update(MovingDirection d)
     }
 
     Point new_point = { 
-        temp_snake_squares[temp_snake_squares.size()-1].square_row + 
-        change_row, temp_snake_squares[temp_snake_squares.size() - 1].square_col + change_col
+        snake_squares[snake_squares.size()-1].square_row + change_row, 
+        snake_squares[snake_squares.size() - 1].square_col + change_col
     };
     if (new_point.square_row >= NUMBER_HORIZONTAL_SQUARES)
         new_point.square_row = 0;
@@ -43,25 +47,35 @@ void Snake::update(MovingDirection d)
     if (new_point.square_col < 0)
         new_point.square_col = NUMBER_VERTICAL_SQUARES - 1;
 
-    temp_snake_squares.erase(temp_snake_squares.begin());
-    temp_snake_squares.push_back(new_point);
+    this->snake_squares.erase(snake_squares.begin());
+    this->snake_squares.push_back(new_point);
+    return new_point;
 }
 
 void Snake::draw(sf::RenderWindow& window)
 {
-    Sleep(120);
+    Sleep(100);
     std::vector<sf::RectangleShape> snake;
-    for (int i = 0; i < temp_snake_squares.size(); i++)
+    for (int i = 0; i < snake_squares.size(); i++)
     {
         snake.push_back(sf::RectangleShape(sf::Vector2f(SQUARE_SIZE, SQUARE_SIZE)));
 
-        int x_pos = temp_snake_squares[i].square_col * SQUARE_SIZE;
-        int y_pos = 200 + temp_snake_squares[i].square_row * SQUARE_SIZE;
+        float x_pos = snake_squares[i].square_col * SQUARE_SIZE;
+        float y_pos = 200 + snake_squares[i].square_row * SQUARE_SIZE;
 
         snake[i].setPosition(x_pos, y_pos);
         snake[i].setFillColor(sf::Color::Blue);
+        window.draw(snake[i]);
     }
-
-    for (const auto& e : snake)
-        window.draw(e);
 }
+
+bool Snake::lost()
+{
+    Point head = snake_squares[snake_squares.size() - 1];
+    for (int i = 0; i < snake_squares.size() - 1; i++)
+        if (head.square_col == snake_squares[i].square_col &&
+            head.square_row == snake_squares[i].square_row)
+            return true;
+    return false;
+}
+

@@ -13,6 +13,7 @@ private:
 public:
 	Game() = default;
 
+	void game_loop();
 	void play(sf::RenderWindow& window);
 	void draw(sf::RenderWindow& window);
 
