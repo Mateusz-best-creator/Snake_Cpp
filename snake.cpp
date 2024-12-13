@@ -49,19 +49,14 @@ void Snake::update(MovingDirection d, bool collision)
     if (new_point.square_col < 0)
         new_point.square_col = NUMBER_VERTICAL_SQUARES - 1;
 
-    std::cout << "COOO?? " << collision << std::endl;
     if (!collision)
-    {
         this->snake_squares.erase(snake_squares.begin());
-    }
-    else
-        std::cout << "Collision!! " << collision << std::endl;
     this->snake_squares.push_back(new_point);
 }
 
 void Snake::draw(sf::RenderWindow& window)
 {
-    Sleep(100);
+    Sleep(SCREEN_SLEEP_TIME);
     std::vector<sf::RectangleShape> snake;
     for (int i = 0; i < snake_squares.size(); i++)
     {
@@ -89,4 +84,9 @@ bool Snake::lost()
 Point& Snake::get_head()
 {
     return head;
+}
+
+const std::vector<Point>& Snake::get_snake_squares() const
+{
+    return this->snake_squares;
 }

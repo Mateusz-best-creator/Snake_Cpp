@@ -26,6 +26,7 @@ private:
 	std::vector<Point> snake_squares;
 	MovingDirection current_moving_direction;
 	Point head;
+	const int SCREEN_SLEEP_TIME = 90;
 
 public:
 	Snake();
@@ -33,4 +34,5 @@ public:
 	void draw(sf::RenderWindow&);
 	bool lost();
 	Point& get_head();
+	const std::vector<Point>& get_snake_squares() const;
 };

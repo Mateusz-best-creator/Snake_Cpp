@@ -9,6 +9,8 @@ private:
 	Board board;
 	Snake snake;
 	Snake::MovingDirection moving_direction;
+	long long int duration_time = 0;
+	const int TIME_TO_GENERATE_FRUIT = 3;
 
 public:
 	Game() = default;

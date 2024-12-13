@@ -19,8 +19,6 @@ private:
 	sf::Font font;
 	sf::Color font_color = sf::Color::White;
 
-	Snake snake;
-
 	std::vector<Point> fruits_points = { {1,1}, {18, 18} };
 	sf::RectangleShape fruit_square;
 	sf::Texture fruit_texture;
@@ -30,4 +28,5 @@ public:
 	void draw_board(sf::RenderWindow&);
 	void draw_top_info(sf::RenderWindow&, const std::string&);
 	bool check_fruit_snake_collision(Point& head);
+	void add_fruit(const std::vector<Point>&);
 };

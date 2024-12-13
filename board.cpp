@@ -1,6 +1,7 @@
 #include "board.h"
 #include <iostream>
 #include <cstdlib>
+#include <ctime> 
 
 Board::Board()
 {
@@ -73,7 +74,6 @@ void Board::draw_top_info(sf::RenderWindow& window, const std::string& msg)
 bool Board::check_fruit_snake_collision(Point& head)
 {
     Point snake_head = head;
-    std::cout << "Head = " << snake_head.square_col << " " << snake_head.square_row << std::endl;
     for (int i = 0; i < fruits_points.size(); i++)
     {
         int fruit_row = fruits_points[i].square_row;
@@ -87,4 +87,45 @@ bool Board::check_fruit_snake_collision(Point& head)
         }
     }
     return false;
+}
+
+void Board::add_fruit(const std::vector<Point>& snake_occupied_squares)
+{
+    srand((unsigned)time(0));
+
+    bool run = true;
+    int row;
+    int column;
+
+    while (run)
+    {
+        row = (rand() % NUMBER_VERTICAL_SQUARES);
+        column = (rand() % NUMBER_HORIZONTAL_SQUARES);
+
+        bool is_occupied_by_snake = false;
+        for (int i = 0; i < snake_occupied_squares.size(); i++)
+        {
+            if (snake_occupied_squares[i].square_row == row &&
+                snake_occupied_squares[i].square_col == column)
+            {
+                is_occupied_by_snake = true;
+                break;
+            }
+        }
+        bool is_occupied_by_fruit = false;
+        for (int i = 0; i < fruits_points.size(); i++)
+        {
+            if (fruits_points[i].square_row == row &&
+                fruits_points[i].square_col == column)
+            {
+                is_occupied_by_fruit = true;
+                break;
+            }
+        }
+
+        if (!is_occupied_by_snake && !is_occupied_by_fruit)
+            run = false;
+    }
+    //std::cout << "Random = " << row << ", " << column << "\n";
+    this->fruits_points.push_back({ row, column });
 }

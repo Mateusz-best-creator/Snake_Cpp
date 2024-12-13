@@ -1,6 +1,8 @@
 #include "game.h"
 #include <windows.h>
 #include <iostream>
+#include <chrono>
+
 void Game::play(sf::RenderWindow& window)
 {
 	this->draw(window);
@@ -8,7 +10,9 @@ void Game::play(sf::RenderWindow& window)
 
 void Game::game_loop()
 {
+    auto start = std::chrono::high_resolution_clock::now();
     bool lost = false;
+
     sf::RenderWindow window(sf::VideoMode(SCREEN_WIDTH, SCREEN_HEIGHT), "Snake - Mateusz Wieczorek");
     while (window.isOpen() && !lost)
     {
@@ -37,10 +41,18 @@ void Game::game_loop()
             window.display();
         }
 
+        auto current_time = std::chrono::high_resolution_clock::now();
+        duration_time = std::chrono::duration_cast<std::chrono::seconds>(current_time - start).count();
+        std::cout << "Duration time : " << duration_time << " seconds" << std::endl;
+        if (duration_time > 0 && duration_time % TIME_TO_GENERATE_FRUIT == 0)
+        {
+            start = std::chrono::high_resolution_clock::now();
+            board.add_fruit(snake.get_snake_squares());
+        }
+
         window.clear(BACKGROUND_COLOR);
         play(window);
         window.display();
-
     }
 }
 
