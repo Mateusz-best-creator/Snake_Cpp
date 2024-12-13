@@ -25,10 +25,12 @@ public:
 private:
 	std::vector<Point> snake_squares;
 	MovingDirection current_moving_direction;
+	Point head;
 
 public:
 	Snake();
-	Point update(MovingDirection);
+	void update(MovingDirection, bool);
 	void draw(sf::RenderWindow&);
 	bool lost();
+	Point& get_head();
 };

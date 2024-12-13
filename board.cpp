@@ -70,9 +70,10 @@ void Board::draw_top_info(sf::RenderWindow& window, const std::string& msg)
     window.draw(points_text);
 }
 
-void Board::check_fruit_snake_collision(Point& head)
+bool Board::check_fruit_snake_collision(Point& head)
 {
     Point snake_head = head;
+    std::cout << "Head = " << snake_head.square_col << " " << snake_head.square_row << std::endl;
     for (int i = 0; i < fruits_points.size(); i++)
     {
         int fruit_row = fruits_points[i].square_row;
@@ -82,7 +83,8 @@ void Board::check_fruit_snake_collision(Point& head)
         {
             fruits_points.erase(fruits_points.begin() + i);
             this->points++;
-            return;
+            return true;
         }
     }
+    return false;
 }

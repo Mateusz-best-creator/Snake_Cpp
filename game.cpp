@@ -1,5 +1,6 @@
 #include "game.h"
 #include <windows.h>
+#include <iostream>
 void Game::play(sf::RenderWindow& window)
 {
 	this->draw(window);
@@ -47,8 +48,8 @@ void Game::draw(sf::RenderWindow& window)
 {
     board.draw_board(window);
     board.draw_top_info(window, "");
-    Point head = snake.update(moving_direction);
-    board.check_fruit_snake_collision(head);
+    bool collision = board.check_fruit_snake_collision(snake.get_head());
+    snake.update(moving_direction, collision);
 	snake.draw(window);
 
 }

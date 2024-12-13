@@ -29,5 +29,5 @@ public:
 	Board();
 	void draw_board(sf::RenderWindow&);
 	void draw_top_info(sf::RenderWindow&, const std::string&);
-	void check_fruit_snake_collision(Point& head);
+	bool check_fruit_snake_collision(Point& head);
 };

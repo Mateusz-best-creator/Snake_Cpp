@@ -3,11 +3,12 @@
 #include <iostream>
 Snake::Snake()
 {
-    this->snake_squares = { {10,8}, {10, 9}, {10, 10}, {10, 11}, {10, 12}, {10, 13}, {10, 14}, {10, 15} };
+    this->snake_squares = { {10,8}, {10, 9}, {10, 10} };
     this->current_moving_direction = MovingDirection::RIGHT;
+    head = snake_squares[snake_squares.size() - 1];
 }
 
-Point Snake::update(MovingDirection d)
+void Snake::update(MovingDirection d, bool collision)
 {
     if (!(current_moving_direction == MovingDirection::LEFT && d == MovingDirection::RIGHT ||
         current_moving_direction == MovingDirection::RIGHT && d == MovingDirection::LEFT ||
@@ -38,6 +39,7 @@ Point Snake::update(MovingDirection d)
         snake_squares[snake_squares.size()-1].square_row + change_row, 
         snake_squares[snake_squares.size() - 1].square_col + change_col
     };
+    head = new_point;
     if (new_point.square_row >= NUMBER_HORIZONTAL_SQUARES)
         new_point.square_row = 0;
     if (new_point.square_row < 0)
@@ -47,9 +49,14 @@ Point Snake::update(MovingDirection d)
     if (new_point.square_col < 0)
         new_point.square_col = NUMBER_VERTICAL_SQUARES - 1;
 
-    this->snake_squares.erase(snake_squares.begin());
+    std::cout << "COOO?? " << collision << std::endl;
+    if (!collision)
+    {
+        this->snake_squares.erase(snake_squares.begin());
+    }
+    else
+        std::cout << "Collision!! " << collision << std::endl;
     this->snake_squares.push_back(new_point);
-    return new_point;
 }
 
 void Snake::draw(sf::RenderWindow& window)
@@ -79,3 +86,7 @@ bool Snake::lost()
     return false;
 }
 
+Point& Snake::get_head()
+{
+    return head;
+}
