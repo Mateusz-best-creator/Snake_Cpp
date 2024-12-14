@@ -3,5 +3,5 @@
 int main()
 { 
     Game game;
-    game.start_page();
+    game.main_page();
 }

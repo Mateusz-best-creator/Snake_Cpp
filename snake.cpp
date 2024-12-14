@@ -73,7 +73,6 @@ void Snake::draw(sf::RenderWindow& window)
 
 bool Snake::lost()
 {
-    Point head = snake_squares[snake_squares.size() - 1];
     for (int i = 0; i < snake_squares.size() - 1; i++)
         if (head.square_col == snake_squares[i].square_col &&
             head.square_row == snake_squares[i].square_row)

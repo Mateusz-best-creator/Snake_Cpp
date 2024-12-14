@@ -2,6 +2,7 @@
 
 #include "board.h"
 #include "snake.h"
+#include <string>
 
 const sf::Color StartRectangleColor(128, 128, 128, 255);
 
@@ -39,13 +40,35 @@ private:
 	sf::Text instruction_text;
 	const int INSTRUCTION_TEXT_SIZE = 50;
 
+	std::string registered_name{};
+	sf::Text name_text, name_text_start;
+	sf::RectangleShape register_r{ sf::Vector2f(SCREEN_WIDTH - 100, RECTANGLE_HEIGHT) };
+
+	struct Player
+	{
+		int points;
+		std::string name;
+		int games_played;
+
+		Player(std::string n)
+			: name(n), points(0), games_played(0) {}
+	};
+	std::vector<Player> playing_players;
+	int player_player_index = -1;
+	const int HALL_TEXT_FONT_SIZE = 35;
+
+
 public:
 	Game();
 
-	void start_page();
 	void game_loop(int level);
 	void play(sf::RenderWindow& window);
 	void draw(sf::RenderWindow& window);
-
 	void set_moving_direction(Snake::MovingDirection);
+	
+	void main_page();
+	void instruction_page(sf::RenderWindow&);
+	void registration_page(sf::RenderWindow&);
+	void hall_of_fame_page(sf::RenderWindow&);
 };
+
